@@ -1,23 +1,9 @@
-const KING = require("./KING_admins");
-const admin_control = require("./admin_control");
-const admin_pas = require("./admin_pas");
+import admin_key from "./admin_key.js";
 
-function fromKING(msg) {
-  console.log("admin_key from KING:", msg);
+export function pushToServer(data) {
+  console.log("KING_admins received:", data);
 }
 
-function fromControl(msg) {
-  console.log("admin_key from admin_control:", msg);
-  KING.fromKey(msg);
-}
-
-function fromPas(msg) {
-  console.log("admin_key from admin_pas:", msg);
-  KING.fromKey(msg);
-}
-
-module.exports = {
-  fromKING,
-  fromControl,
-  fromPas
-};
+admin_key.onCommand((cmd) => {
+  pushToServer(cmd);
+});
