@@ -1,4 +1,4 @@
-port adminControl from "./admin_control.js";
+import adminControl from "./admin_control.js";
 import adminPass from "./admin_pas.js";
 
 export default {
