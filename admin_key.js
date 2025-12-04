@@ -1,17 +1,19 @@
-import adminControl from "./admin_control.js";
-import adminPas from "./admin_pas.js";
+port adminControl from "./admin_control.js";
+import adminPass from "./admin_pas.js";
 
 export default {
-  async handle(command) {
+  handle: async (command) => {
     try {
-      // يرسل الأمر للتحكم الأساسي
-      if (adminControl[command]) {
-        return await adminControl[command]();
+      console.log("admin_key received:", command);
+
+      // جرب في admin_control
+      if (await adminControl.handle(command)) {
+        return await adminControl.handle(command);
       }
 
-      // أو إذا كان موجود في admin_pas
-      if (adminPas[command]) {
-        return await adminPas[command]();
+      // جرب في admin_pass
+      if (await adminPass.handle(command)) {
+        return await adminPass.handle(command);
       }
 
       return null;
