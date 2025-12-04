@@ -1,30 +1,32 @@
-
-import express from "express";
+ "express";
+import { Telegraf } from "telegraf";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
-// منع التحذيرات الصفراء
-process.removeAllListeners("warning");
+const BOT_TOKEN = process.env.BOT_TOKEN;
+const TELEGRAM_ID = process.env.TELEGRAM_ID;
 
-// اظهار تحميل المفاتيح
-console.log("Server started successfully...");
-console.log("BOT_TOKEN Loaded:", process.env.BOT_TOKEN ? "YES" : "NO");
-console.log("TELEGRAM_ID Loaded:", process.env.TELEGRAM_ID ? "YES" : "NO");
+console.log("BOT_TOKEN Loaded:", BOT_TOKEN ? "YES" : "NO");
+console.log("TELEGRAM_ID Loaded:", TELEGRAM_ID ? "YES" : "NO");
 
-// مسار فحص التشغيل
+const bot = new Telegraf(BOT_TOKEN);
+
+// عند وصول رسالة للبوت
+bot.on("text", async (ctx) => {
+  if (ctx.from.id.toString() !== TELEGRAM_ID) return;
+  await ctx.reply("تم استلام رسالتك ✔");
+});
+
+// تأكيد استيقاظ السيرفر من Render
 app.get("/", (req, res) => {
-  res.send("Bot system is running...");
+  res.send("Telegram Bot Server Active ✔");
 });
 
-// منع الخروج المبكر بإبقاء السيرفر حيًّا
+bot.launch();
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
-
-// لمنع Render من الإغلاق
-setInterval(() => {
-  console.log("Keep Alive Ping:", new Date().toISOString());
-}, 1000 * 60 * 5); // كل 5 دقائق
