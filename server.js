@@ -1,37 +1,31 @@
+import express from "express";
 import TelegramBot from "node-telegram-bot-api";
 import dotenv from "dotenv";
-
 dotenv.config();
 
-const BOT_TOKEN = process.env.BOT_TOKEN;
-const TELEGRAM_ID = process.env.TELEGRAM_ID;
+const app = express();
 
-// فحص وجود المفاتيح
-console.log("BOT_TOKEN Loaded:", BOT_TOKEN ? "تم تشغيل ايها لملك 👑 مارشال دي شادو 👑" : "نيك مو نضام تاع زبي لم يشتغ ثا سييدي 😡");
-console.log("TELEGRAM_ID Loaded:", TELEGRAM_ID ? "تم تشغيل ايها لملك 👑 مارشال دي شادو 👑" : "نيك مو نضام تاع زبي لم يشتغ ثا سييدي 😡");
+const TOKEN = process.env.BOT_TOKEN;
+const USER_ID = process.env.TELEGRAM_ID;
+const URL = process.env.RENDER_EXTERNAL_URL;
 
-// إنشاء البوت
-const bot = new TelegramBot(BOT_TOKEN, { polling: true });
+const bot = new TelegramBot(TOKEN, { webHook: true });
+bot.setWebHook(`${URL}/bot${TOKEN}`);
 
-// إرسال رسالة بدء للخادم
-bot.sendMessage(TELEGRAM_ID, "🔵 Server Started... Bot is Running.");
+app.use(express.json());
 
-// استقبال نصوص
-bot.on("message", (msg) => {
-  if (!msg.text) return;
-
-  bot.sendMessage(TELEGRAM_ID, `📩 Received: ${msg.text}`);
+app.post(`/bot${TOKEN}`, (req, res) => {
+  bot.processUpdate(req.body);
+  res.sendStatus(200);
 });
 
-// تشغيل خادم وهمي لـ Render
-import http from "http";
-const PORT = process.env.PORT || 10000;
+bot.on("message", (msg) => {
+  if (msg.chat.id.toString() === USER_ID) {
+    bot.sendMessage(USER_ID, "تم استلام رسالتك 👌");
+  }
+});
 
-http
-  .createServer((req, res) => {
-    res.writeHead(200, { "Content-Type": "text/plain" });
-    res.end("Bot Server Running\n");
-  })
-  .listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => {
+  console.log("SERVER STARTED");
+});
