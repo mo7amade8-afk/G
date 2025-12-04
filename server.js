@@ -10,11 +10,13 @@ const USER_ID = process.env.TELEGRAM_ID;
 const URL = process.env.RENDER_EXTERNAL_URL;
 
 const bot = new TelegramBot(TOKEN, { webHook: true });
-bot.setWebHook(`${URL}/bot${TOKEN}`);
+
+// Webhook الصحيح
+bot.setWebHook(`${URL}/webhook/${TOKEN}`);
 
 app.use(express.json());
 
-app.post(`/bot${TOKEN}`, (req, res) => {
+app.post(`/webhook/${TOKEN}`, (req, res) => {
   bot.processUpdate(req.body);
   res.sendStatus(200);
 });
@@ -26,6 +28,4 @@ bot.on("message", (msg) => {
 });
 
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => {
-  console.log("SERVER STARTED");
-});
+app.listen(PORT, () => console.log("SERVER STARTED"));
