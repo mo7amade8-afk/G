@@ -1,9 +1,13 @@
-import admin_key from "./admin_key.js";
+import adminKey from "./admin_key.js";
 
-export function pushToServer(data) {
-  console.log("KING_admins received:", data);
-}
+export default {
+  async handle(command) {
+    // نمرر الأمر للأسفل (admin_key)
+    const result = await adminKey.handle(command);
 
-admin_key.onCommand((cmd) => {
-  pushToServer(cmd);
-});
+    // لو مافيه نتيجة → غير معروف
+    if (!result) return null;
+
+    return result;
+  }
+};
