@@ -2,12 +2,13 @@ import adminKey from "./admin_key.js";
 
 export default {
   async handle(command) {
-    // نمرر الأمر للأسفل (admin_key)
-    const result = await adminKey.handle(command);
-
-    // لو مافيه نتيجة → غير معروف
-    if (!result) return null;
-
-    return result;
+    try {
+      // تحويل الطلب إلى admin_key
+      const result = await adminKey.handle(command);
+      return result; // يرجع للـ server
+    } catch (err) {
+      console.log("KING_admins ERROR:", err);
+      return null;
+    }
   }
 };
