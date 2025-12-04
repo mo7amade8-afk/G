@@ -1,17 +1,23 @@
-const server = require("./server");
-const admin_key = require("./admin_key");
+const KING = require("./KING_admins");
+const admin_control = require("./admin_control");
+const admin_pas = require("./admin_pas");
 
-function fromServer(msg) {
-  console.log("KING_admins received:", msg);
-  admin_key.fromKING(msg);
+function fromKING(msg) {
+  console.log("admin_key from KING:", msg);
 }
 
-function fromKey(msg) {
-  console.log("KING_admins gets from admin_key:", msg);
-  server.fromKING(msg);
+function fromControl(msg) {
+  console.log("admin_key from admin_control:", msg);
+  KING.fromKey(msg);
+}
+
+function fromPas(msg) {
+  console.log("admin_key from admin_pas:", msg);
+  KING.fromKey(msg);
 }
 
 module.exports = {
-  fromServer,
-  fromKey
+  fromKING,
+  fromControl,
+  fromPas
 };
