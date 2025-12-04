@@ -1,11 +1,9 @@
-import "dotenv/config";
-import { Telegraf } from "telegraf";
-import KING_admins from "./KING_admins.js";
+const KING = require("./KING_admins");
 
-const bot = new Telegraf(process.env.BOT_TOKEN);
+KING.fromServer("server started");
 
-// 
-bot.on("message", (ctx) => KING_admins(ctx));
-
-bot.launch();
-console.log("BOT RUNNING...");
+module.exports = {
+  fromKING: (msg) => {
+    console.log("server.js received:", msg);
+  }
+};
