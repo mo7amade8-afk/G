@@ -1,9 +1,7 @@
-const KING = require("./KING_admins");
+import express from "express";
+import "./KING_admins.js";
 
-KING.fromServer("server started");
+const app = express();
+app.get("/", (req, res) => res.send("Server Running"));
 
-module.exports = {
-  fromKING: (msg) => {
-    console.log("server.js received:", msg);
-  }
-};
+app.listen(3000);
