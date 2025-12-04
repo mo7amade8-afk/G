@@ -1,31 +1,66 @@
 import express from "express";
-import TelegramBot from "node-telegram-bot-api";
+import axios from "axios";
+import bodyParser from "body-parser";
 import dotenv from "dotenv";
 dotenv.config();
 
+// الملف الوسيط الرئيسي
+import KING from "./KING_admins.js";
+
 const app = express();
+app.use(bodyParser.json());
 
 const TOKEN = process.env.BOT_TOKEN;
-const USER_ID = process.env.TELEGRAM_ID;
-const URL = process.env.RENDER_EXTERNAL_URL;
+const API = `https://api.telegram.org/bot${TOKEN}/`;
 
-const bot = new TelegramBot(TOKEN, { webHook: true });
+// إرسال رسالة
+async function sendMessage(chatId, text) {
+  await axios.post(API + "sendMessage", {
+    chat_id: chatId,
+    text: text
+  });
+}
 
-// Webhook الصحيح
-bot.setWebHook(`${URL}/webhook/${TOKEN}`);
+// إرسال صورة
+async function sendPhoto(chatId, url) {
+  await axios.post(API + "sendPhoto", {
+    chat_id: chatId,
+    photo: url
+  });
+}
 
-app.use(express.json());
-
-app.post(`/webhook/${TOKEN}`, (req, res) => {
-  bot.processUpdate(req.body);
+app.post("/webhook", async (req, res) => {
   res.sendStatus(200);
-});
 
-bot.on("message", (msg) => {
-  if (msg.chat.id.toString() === USER_ID) {
-    bot.sendMessage(USER_ID, "تم استلام رسالتك 👌");
+  try {
+    const msg = req.body.message;
+    if (!msg) return;
+
+    const chatId = msg.chat.id;
+    const text = msg.text?.trim();
+
+    // أول شيء: نفحص إذا الأمر معروف داخل KING_admins
+    const result = await KING.handle(text);
+
+    if (!result) {
+      return sendMessage(chatId, "الأمر غير معروف ❌");
+    }
+
+    // لو الرد نص
+    if (result.type === "text") {
+      return sendMessage(chatId, result.data);
+    }
+
+    // لو الرد صورة
+    if (result.type === "photo") {
+      return sendPhoto(chatId, result.data);
+    }
+
+  } catch (e) {
+    console.log("SERVER ERROR:", e);
   }
 });
 
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => console.log("SERVER STARTED"));
+app.listen(3000, () => {
+  console.log("SERVER RUNNING...");
+});
