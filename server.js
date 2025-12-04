@@ -1,32 +1,37 @@
-import express from "express";
-import { Telegraf } from "telegraf";
+import TelegramBot from "node-telegram-bot-api";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const app = express();
-const PORT = process.env.PORT || 10000;
-
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const TELEGRAM_ID = process.env.TELEGRAM_ID;
 
-console.log("BOT_TOKEN Loaded:", BOT_TOKEN ? "YES" : "NO");
-console.log("TELEGRAM_ID Loaded:", TELEGRAM_ID ? "YES" : "NO");
+// فحص وجود المفاتيح
+console.log("BOT_TOKEN Loaded:", BOT_TOKEN ? "تم تشغيل ايها لملك 👑 مارشال دي شادو 👑" : "نيك مو نضام تاع زبي لم يشتغ ثا سييدي 😡");
+console.log("TELEGRAM_ID Loaded:", TELEGRAM_ID ? "تم تشغيل ايها لملك 👑 مارشال دي شادو 👑" : "نيك مو نضام تاع زبي لم يشتغ ثا سييدي 😡");
 
-const bot = new Telegraf(BOT_TOKEN);
+// إنشاء البوت
+const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 
-// عند وصول رسالة للبوت
-bot.on("text", async (ctx) => {
-  if (ctx.from.id.toString() !== TELEGRAM_ID) return;
-  await ctx.reply("تم استلام رسالتك ✔");
+// إرسال رسالة بدء للخادم
+bot.sendMessage(TELEGRAM_ID, "🔵 Server Started... Bot is Running.");
+
+// استقبال نصوص
+bot.on("message", (msg) => {
+  if (!msg.text) return;
+
+  bot.sendMessage(TELEGRAM_ID, `📩 Received: ${msg.text}`);
 });
 
-// تأكيد استيقاظ السيرفر من Render
-app.get("/", (req, res) => {
-  res.send("Telegram Bot Server Active ✔");
-});
+// تشغيل خادم وهمي لـ Render
+import http from "http";
+const PORT = process.env.PORT || 10000;
 
-bot.launch();
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+http
+  .createServer((req, res) => {
+    res.writeHead(200, { "Content-Type": "text/plain" });
+    res.end("Bot Server Running\n");
+  })
+  .listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
