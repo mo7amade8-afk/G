@@ -2,24 +2,17 @@ import adminControl from "./admin_control.js";
 import adminPass from "./admin_pas.js";
 
 export default {
-  handle: async (command) => {
-    try {
-      console.log("admin_key received:", command);
+  async handle(command) {
+    console.log("admin_key received:", command);
 
-      // جرب في admin_control
-      if (await adminControl.handle(command)) {
-        return await adminControl.handle(command);
-      }
+    let res;
 
-      // جرب في admin_pass
-      if (await adminPass.handle(command)) {
-        return await adminPass.handle(command);
-      }
+    res = await adminControl.handle(command);
+    if (res) return res;
 
-      return null;
-    } catch (err) {
-      console.log("admin_key ERROR:", err);
-      return null;
-    }
+    res = await adminPass.handle(command);
+    if (res) return res;
+
+    return null;
   }
 };
