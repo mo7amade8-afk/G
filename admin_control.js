@@ -1,13 +1,23 @@
-import image from "./image.js";
-import text from "./text.js";
-import { send } from "./admin_key.js";
+const text = require("./text");
+const image = require("./image");
 
-export function controlImage(cmd) {
-  send(image.handle(cmd));
-}
+module.exports = function adminControl(update) {
+  try {
+    if (!update.message) return;
 
-export function controlText(cmd) {
-  send(text.handle(cmd));
-}
+    // رسالة نصية
+    if (update.message.text) {
+      text(update);
+      return;
+    }
 
-export default { controlImage, controlText };
+    // صورة
+    if (update.message.photo) {
+      image(update);
+      return;
+    }
+
+  } catch (err) {
+    console.error("admin_control error:", err.message);
+  }
+};
