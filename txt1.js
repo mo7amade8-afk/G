@@ -1,64 +1,37 @@
-// src/txt1.js
-import axios from "axios";
+const axios = require("axios");
 
-const TOKEN = process.env.BOT_TOKEN;
-const API = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
+const BOT_TOKEN = process.env.BOT_TOKEN;
+const TELEGRAM_API = `https://api.telegram.org/bot${BOT_TOKEN}`;
 
-async function send(chatId, text) {
-  return axios.post(API, {
-    chat_id: chatId,
-    text
-  });
-}
 
-export async function handleText(chatId, text, username = "User") {
-  if (!text) return null;
+const replies = [
+  "أهلا 👋",
+  "كيفك؟ 😊",
+  "مرحبا 🌸",
+  "نورت 🤍",
+  "أهلا وسهلا!",
+  "تشرفنا ✨",
+  "كيف الأمور؟"
+];
 
-  const msg = text.toLowerCase().trim();
+module.exports = async function txt1(update) {
+  try {
+    const message = update.message;
+    if (!message || !message.text) return;
 
-  if (msg === "hi" || msg === "hello" || msg === "hlw") {
-    return send(chatId, "Hello, Hi, Bye bye. what else you know");
+    const chatId = message.chat.id;
+
+    
+    const randomReply =
+      replies[Math.floor(Math.random() * replies.length)];
+
+    
+    await axios.post(`${TELEGRAM_API}/sendMessage`, {
+      chat_id: chatId,
+      text: randomReply
+    });
+
+  } catch (err) {
+    console.error("txt1 error:", err.message);
   }
-
-  if (msg === "bot") {
-    return send(chatId, "your Mom will enter prefix?");
-  }
-
-  if (msg === "morning" || msg === "good morning") {
-    return send(chatId, "Hello dear, have a nice day ❤️");
-  }
-
-  if (msg === "lol") {
-    return send(chatId, "😂");
-  }
-
-  if (msg === "owner" || msg === "create you") {
-    return send(
-      chatId,
-      "OWNER: Ratul Hassan\nFacebook: www.facebook.com/MrTomXxX"
-    );
-  }
-
-  if (msg === "kiss" || msg === "kiss me") {
-    return send(chatId, "Ewwww 😾");
-  }
-
-  if (msg === "nice" || msg === "thank you") {
-    return send(chatId, "yeah im so good you're always welcome");
-  }
-
-  if (msg === "how are you") {
-    return send(chatId, "Im always good when i see you smiling 😊");
-  }
-
-  if (msg === "does the bot love me") {
-    return send(chatId, "Yes <3");
-  }
-
-  // إذا بدأ الرسالة بكلمة bot
-  if (msg.startsWith("bot")) {
-    return send(chatId, `${username} 👀`);
-  }
-
-  return null; // لا رد
-}
+};
