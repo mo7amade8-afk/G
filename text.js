@@ -1,37 +1,15 @@
-const axios = require("axios");
+const txt1 = require("./txt1");
 
-const BOT_TOKEN = process.env.BOT_TOKEN;
-const TELEGRAM_API = `https://api.telegram.org/bot${BOT_TOKEN}`;
-
-// ردود عشوائية
-const replies = [
-  "أهلا 👋",
-  "كيفك؟ 😊",
-  "مرحبا 🌸",
-  "نورت 🤍",
-  "أهلا وسهلا!",
-  "تشرفنا ✨",
-  "كيف الأمور؟"
-];
-
-module.exports = async function txt1(update) {
+module.exports = function textHandler(update) {
   try {
-    const message = update.message;
-    if (!message || !message.text) return;
 
-    const chatId = message.chat.id;
+    if (!update.message) return;
+    if (!update.message.text) return;
 
-    // اختيار رد عشوائي
-    const randomReply =
-      replies[Math.floor(Math.random() * replies.length)];
 
-    // إرسال الرد
-    await axios.post(`${TELEGRAM_API}/sendMessage`, {
-      chat_id: chatId,
-      text: randomReply
-    });
+    txt1(update);
 
   } catch (err) {
-    console.error("txt1 error:", err.message);
+    console.error("text.js error:", err.message);
   }
 };
