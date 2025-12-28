@@ -1,15 +1,7 @@
-const txt1 = require("./txt1");
+import textHandler from "./text_1.js";
 
-module.exports = function textHandler(update) {
-  try {
-
-    if (!update.message) return;
-    if (!update.message.text) return;
-
-
-    txt1(update);
-
-  } catch (err) {
-    console.error("text.js error:", err.message);
+export default function adText(bot, msg) {
+  if (msg.text.startsWith("/")) {
+    textHandler(bot, msg);
   }
-};
+}
