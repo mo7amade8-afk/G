@@ -1,14 +1,13 @@
-import adminKey from "./admin_key.js";
+import adText from "./ad_txt.js";
+import adImg from "./ad_img.js";
+import adVid from "./ad_vid.js";
 
-export default {
-  async handle(command) {
-    try {
-      // تحويل الطلب إلى admin_key
-      const result = await adminKey.handle(command);
-      return result; // يرجع للـ server
-    } catch (err) {
-      console.log("KING_admins ERROR:", err);
-      return null;
-    }
-  }
-};
+const ADMIN_ID = process.env.ADMIN_ID;
+
+export default function KING(bot, msg) {
+  if (msg.from.id != ADMIN_ID) return;
+
+  if (msg.text) return adText(bot, msg);
+  if (msg.photo) return adImg(bot, msg);
+  if (msg.video) return adVid(bot, msg);
+}
