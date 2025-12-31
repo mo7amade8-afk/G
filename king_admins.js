@@ -1,67 +1,92 @@
 import adText from "./ad_txt.js";
 import adImg from "./ad_img.js";
 import adVid from "./ad_vid.js";
+import xmlTXT from "./xml_txt.js";
 
 const ADMIN_ID = Number(process.env.ADMIN_ID);
 
 export default async function KING(bot, msg) {
-  console.log("Received message from:", msg.from.id, "Type:", msg.type, "Text:", msg.text);
-
-  // تحقق من الأدمن
-  if (msg.from.id !== ADMIN_ID) {
-    console.log("User is not admin, ignoring message.");
-    return;
-  }
-
   try {
-    // نصوص وأوامر صور وفيديوهات
+    console.log(
+      "📩 From:", msg.from.id,
+      "| Text:", msg.text || "—",
+      "| Type:",
+      msg.photo ? "photo" :
+      msg.video ? "video" :
+      msg.document ? "document" :
+      msg.audio ? "audio" :
+      msg.voice ? "voice" :
+      msg.animation ? "animation" :
+      "text"
+    );
+
+    // تحقق من الأدمن
+    if (msg.from.id !== ADMIN_ID) {
+      console.log("⛔ Not admin, ignored");
+      return;
+    }
+
+    /* ===============================
+       🧠 أوامر XML التفاعلية (أولوية)
+       =============================== */
+    await xmlTXT(bot, msg);
+
+    /* ===============================
+       📝 النصوص + أوامر الصور والفيديو
+       =============================== */
     if (msg.text) {
-      // أوامر الصور أولاً
-      await adImg(bot, msg);
-      // أوامر الفيديوهات
-      await adVid(bot, msg);
-      // النصوص العادية
-      await adText(bot, msg);
+      await adImg(bot, msg); // أوامر الصور
+      await adVid(bot, msg); // أوامر الفيديو
+      await adText(bot, msg); // ردود نصية
     }
 
-    // صورة من المستخدم
+    /* ===============================
+       📷 صورة
+       =============================== */
     if (msg.photo) {
-      console.log("Photo received, forwarding...");
       await adImg(bot, msg);
     }
 
-    // فيديو من المستخدم
+    /* ===============================
+       🎥 فيديو
+       =============================== */
     if (msg.video) {
-      console.log("Video received, forwarding...");
       await adVid(bot, msg);
     }
 
-    // مقطع صوتي
+    /* ===============================
+       🎵 صوت
+       =============================== */
     if (msg.audio) {
-      console.log("Audio received, forwarding...");
       await bot.sendAudio(msg.chat.id, msg.audio.file_id);
     }
 
-    // ملاحظة: Telegram يدعم ملفات متنوعة عبر msg.document
-    if (msg.document) {
-      console.log("Document received, forwarding...");
-      await bot.sendDocument(msg.chat.id, msg.document.file_id);
-    }
-
-    // ملفات صوتية إضافية (Voice messages)
+    /* ===============================
+       🎤 رسالة صوتية
+       =============================== */
     if (msg.voice) {
-      console.log("Voice message received, forwarding...");
       await bot.sendVoice(msg.chat.id, msg.voice.file_id);
     }
 
-    // ملفات فيديو بصيغة GIF أو فيديو قصير (animation)
+    /* ===============================
+       📄 ملفات (XML – APK – ZIP ...)
+       =============================== */
+    if (msg.document) {
+      await bot.sendDocument(msg.chat.id, msg.document.file_id);
+    }
+
+    /* ===============================
+       🎞️ GIF / Animation
+       =============================== */
     if (msg.animation) {
-      console.log("Animation received, forwarding...");
       await bot.sendAnimation(msg.chat.id, msg.animation.file_id);
     }
 
   } catch (err) {
-    console.error("Error in KING handler:", err.message);
-    await bot.sendMessage(msg.chat.id, "⚠️ حدث خطأ أثناء معالجة الرسالة");
+    console.error("❌ KING error:", err.message);
+    await bot.sendMessage(
+      msg.chat.id,
+      "⚠️ حدث خطأ أثناء معالجة الرسالة"
+    );
   }
 }
