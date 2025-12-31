@@ -1,7 +1,7 @@
 const commands = {
   "جلجامشة": {
     image: "https://i.ibb.co/cSKV6xVp/gil0.jpg",
-    caption: " هاذي جلجامشة القحبة 🐸🍻"
+    caption: "هاذي جلجامشة"
   }
 };
 
@@ -10,11 +10,20 @@ export default async function img1(bot, msg) {
     if (!msg.text) return;
 
     const chatId = msg.chat.id;
-    const text = msg.text.trim();
+    const text = msg.text.trim().toLowerCase(); // تجاهل الفرق بين الحروف الكبيرة والصغيرة
 
-    if (!commands[text]) return;
+    // البحث عن الأمر بغض النظر عن الحالة
+    const commandKey = Object.keys(commands).find(
+      k => k.toLowerCase() === text
+    );
 
-    const { image, caption } = commands[text];
+    if (!commandKey) {
+      console.log("No image command found for:", text);
+      return;
+    }
+
+    const { image, caption } = commands[commandKey];
+    console.log("Sending image:", image);
 
     await bot.sendPhoto(chatId, image, { caption });
   } catch (err) {
