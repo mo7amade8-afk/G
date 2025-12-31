@@ -1,24 +1,21 @@
-import { parseStringPromise } from "xml2js";
+import fs from "fs-extra";
+import { AXMLParser } from "axml-parser";
 
-/**
- * فك وتحليل XML إلى JSON
- * @param {string} xmlData
- * @returns {object}
- */
-export async function decodeXML(xmlData) {
-  if (!xmlData || typeof xmlData !== "string") {
-    throw new Error("XML input is empty or invalid");
-  }
-
+// دالة لفك XML الثنائي
+export async function decodeXML(binaryXmlBuffer) {
   try {
-    const result = await parseStringPromise(xmlData, {
-      explicitArray: false, // لا يحول العناصر إلى مصفوفات
-      trim: true,           // حذف الفراغات
-      mergeAttrs: true      // دمج الخصائص
-    });
+    // إذا كان النص عبارة عن Base64 من Telegram
+    let buffer;
+    if (typeof binaryXmlBuffer === "string") {
+      buffer = Buffer.from(binaryXmlBuffer, "base64");
+    } else {
+      buffer = binaryXmlBuffer;
+    }
 
-    return result;
+    const parser = new AXMLParser(buffer);
+    const xmlObj = parser.parse();
+    return xmlObj; // هذا ككائن JSON
   } catch (err) {
-    throw new Error("Failed to decode XML: " + err.message);
+    throw new Error("Failed to decode binary XML: " + err.message);
   }
 }
