@@ -1,7 +1,7 @@
 import adText from "./ad_txt.js";
 import adImg from "./ad_img.js";
 import adVid from "./ad_vid.js";
-import xmlTXT from "./xml_txt.js";
+import adXml from "./ad_xml.js";
 
 const ADMIN_ID = Number(process.env.ADMIN_ID);
 
