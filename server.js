@@ -12,17 +12,22 @@ const PORT = process.env.PORT || 3000;
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const WEBHOOK_URL = process.env.WEBHOOK_URL; // رابط مشروعك على Render بدون /webhook
 
-// إنشاء البوت بدون polling
-const bot = new TelegramBot(BOT_TOKEN);
+// إنشاء البوت بنظام Webhook فقط
+const bot = new TelegramBot(BOT_TOKEN, { webHook: true });
 
 // معالجة التحديثات القادمة من Webhook
 app.post("/webhook", (req, res) => {
-  bot.processUpdate(req.body);
+  try {
+    bot.processUpdate(req.body);
+  } catch (err) {
+    console.error("Webhook error:", err.message);
+  }
   res.sendStatus(200);
 });
 
-// تمرير الرسائل إلى KING
+// تمرير الرسائل إلى KING مع تسجيل
 bot.on("message", (msg) => {
+  console.log("Message received:", msg);
   KING(bot, msg);
 });
 
