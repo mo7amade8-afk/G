@@ -2,11 +2,11 @@ import adText from "./ad_txt.js";
 import adImg from "./ad_img.js";
 import adVid from "./ad_vid.js";
 
-const ADMIN_ID = process.env.ADMIN_ID; // ضع ايدي الأدمن هنا
+const ADMIN_ID = Number(process.env.ADMIN_ID); // تحويل إلى رقم
 
 export default function KING(bot, msg) {
-
-  if (msg.from.id != ADMIN_ID) return;
+  // تحقق من الأدمن
+  if (msg.from.id !== ADMIN_ID) return;
 
   if (msg.text) return adText(bot, msg);
   if (msg.photo) return adImg(bot, msg);
