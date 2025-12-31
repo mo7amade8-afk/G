@@ -1,4 +1,4 @@
-import img1 from "./img1.js";
+import img_1 from "./img_1.js";
 
 export function handle(cmd) {
   return img1.run(cmd);
