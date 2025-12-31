@@ -1,7 +1,5 @@
-import img_1 from "./img_1.js";
+import img1 from "./img_1.js";
 
-export function handle(cmd) {
-  return img1.run(cmd);
+export default function adImg(bot, msg) {
+  img1(bot, msg);
 }
-
-export default { handle };
