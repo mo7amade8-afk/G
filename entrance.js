@@ -14,7 +14,7 @@ export default function welcomeOnAdd(bot) {
         (oldStatus === "left" || oldStatus === "kicked") &&
         (newStatus === "member" || newStatus === "administrator")
       ) {
-        const gifUrl = "https://i.ibb.co/xxxxxx/welcome.gif"; // رابط مباشر GIF
+        const gifUrl = "https://i.ibb.co/Tq4Sj5KT/50574e0daddf43ac4cb8ee584c4d09ae.gif"; // رابط مباشر GIF
 
         await bot.sendAnimation(chatId, gifUrl, {
           caption:
