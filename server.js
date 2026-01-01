@@ -2,7 +2,7 @@ import express from "express";
 import TelegramBot from "node-telegram-bot-api";
 import dotenv from "dotenv";
 import { handleMessage } from "./king_admins.js";
-import { initServer2 } from "./server_2.js";
+import { initServer2 } from "./server_2.js"; // ✅ استدعاء صحيح
 
 dotenv.config();
 
@@ -18,10 +18,9 @@ if (!BOT_TOKEN || !WEBHOOK_URL) {
   process.exit(1);
 }
 
-// البوت بدون polling
 const bot = new TelegramBot(BOT_TOKEN, { polling: false });
 
-// التعامل مع تحديثات webhook
+// معالجة تحديثات Webhook
 app.post("/webhook", async (req, res) => {
   try {
     await bot.processUpdate(req.body);
@@ -34,19 +33,17 @@ app.post("/webhook", async (req, res) => {
 
 // تمرير الرسائل إلى king_admins
 bot.on("message", (msg) => {
-  console.log("📩 Message received:", msg.from.username || msg.from.id, msg.text || "[non-text message]");
   handleMessage(bot, msg);
 });
 
-// تفعيل الترحيب و GIF و الصوت عبر server_2.js
+// استدعاء server_2.js لتحديثات الترحيب والصور
 initServer2(bot);
 
-// endpoint للتأكد من سيرفر Render
 app.get("/", (req, res) => {
   res.send("✅ Bot is running with Webhook...");
 });
 
-// تشغيل السيرفر وتعيين webhook
+// تشغيل السيرفر وتعيين Webhook
 app.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT}`);
   try {
