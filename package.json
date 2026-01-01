@@ -10,8 +10,6 @@
     "express": "^4.19.2",
     "node-telegram-bot-api": "^0.66.0",
     "dotenv": "^16.4.5",
-    "xml2js": "^0.6.2",
-    "binary-xml": "^1.0.0",
     "fs-extra": "^11.1.1",
     "node-fetch": "^3.3.1"
   }
