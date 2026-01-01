@@ -2,52 +2,68 @@ import express from "express";
 import TelegramBot from "node-telegram-bot-api";
 import dotenv from "dotenv";
 import KING from "./king_admins.js";
-import server2 from "./server_2.js"; // ملف إضافي للتحكم أو وظائف ثانية
+import server2 from "./server_2.js";
 
 dotenv.config();
 
 const app = express();
-app.use(express.json()); // مهم جدًا لقراءة بيانات Webhook
+app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 const BOT_TOKEN = process.env.BOT_TOKEN;
-const WEBHOOK_URL = process.env.WEBHOOK_URL; // رابط مشروعك على Render بدون /webhook
+const WEBHOOK_URL = process.env.WEBHOOK_URL;
 
-// إنشاء البوت بنظام Webhook فقط
-const bot = new TelegramBot(BOT_TOKEN, { webHook: true });
+if (!BOT_TOKEN || !WEBHOOK_URL) {
+  console.error("❌ BOT_TOKEN أو WEBHOOK_URL غير موجودين");
+  process.exit(1);
+}
 
-// تمرير التحديثات القادمة من Webhook إلى king_admins
-bot.on("message", (msg) => {
-  console.log("📩 Message received:", msg.text || msg);
-  KING(bot, msg);
-});
+// إنشاء البوت (Webhook فقط)
+const bot = new TelegramBot(BOT_TOKEN, { polling: false });
 
-// تمرير التحديثات إلى server_2.js لو فيه أي وظيفة إضافية
-bot.on("message", (msg) => {
-  server2(bot, msg);
-});
-
-// معالجة التحديثات القادمة من Webhook
-app.post("/webhook", (req, res) => {
+/* =========================
+   📥 Webhook
+   ========================= */
+app.post("/webhook", async (req, res) => {
   try {
-    bot.processUpdate(req.body);
+    await bot.processUpdate(req.body);
+    res.sendStatus(200);
   } catch (err) {
     console.error("❌ Webhook error:", err.message);
+    res.sendStatus(500);
   }
-  res.sendStatus(200);
 });
 
-// سيرفر للتأكد أن Render يعمل
+/* =========================
+   🧠 رسائل (إدارية)
+   ========================= */
+bot.on("message", async (msg) => {
+  console.log("📩 Message:", msg.chat.id);
+  await KING(bot, msg);
+});
+
+/* =========================
+   🤖 تحميل السيرفر الثاني
+   ========================= */
+server2(bot);
+
+/* =========================
+   🌐 فحص
+   ========================= */
 app.get("/", (req, res) => {
-  res.send("🤖 Bot is running with Webhook...");
+  res.send("✅ Main server running");
 });
 
-// تشغيل السيرفر وتعيين Webhook تلقائيًا
+/* =========================
+   🚀 تشغيل + Webhook
+   ========================= */
 app.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT}`);
   try {
-    await bot.setWebHook(`${WEBHOOK_URL}/webhook`);
-    console.log(`✅ Webhook set: ${WEBHOOK_URL}/webhook`);
+    await bot.setWebHook(`${WEBHOOK_URL}/webhook`, {
+      allowed_updates: ["message", "my_chat_member"]
+    });
+    console.log("✅ Webhook set");
   } catch (err) {
     console.error("❌ Failed to set Webhook:", err.message);
   }
