@@ -1,34 +1,27 @@
-bot.on("chat_member", async (msg) => {
-  try {
-    const chatId = msg.chat.id;
-    const botId = bot.botInfo.id;
+export function initServer2(bot) {
+  // الترحيب عند إضافته لأي مجموعة
+  bot.on("my_chat_member", async (msg) => {
+    try {
+      const botId = bot.botInfo.id;
+      const chatId = msg.chat.id;
 
-    // تحقق أن البوت تمت إضافته
-    if (msg.new_chat_member.user.id !== botId) return;
+      // تحقق أن البوت تمت إضافته الآن
+      if (msg.new_chat_member?.user?.id !== botId) return;
+      if ((msg.old_chat_member?.status === "left" || msg.old_chat_member?.status === "kicked") &&
+          (msg.new_chat_member?.status === "member" || msg.new_chat_member?.status === "administrator")) {
 
-    const oldStatus = msg.old_chat_member.status;
-    const newStatus = msg.new_chat_member.status;
+        const gifUrl = "https://i.ibb.co/Tq4Sj5KT/50574e0daddf43ac4cb8ee584c4d09ae.gif"; // رابط GIF
+        const audioUrl = ""; // رابط صوتي
+        const captionText = "👋 مرحبًا بالجميع!\nأنا بوت جديد في هذا الجروب 🤖\nسعيد بوجودي معكم 💙";
 
-    if ((oldStatus === "left" || oldStatus === "kicked") &&
-        (newStatus === "member" || newStatus === "administrator")) {
+        // إرسال GIF
+        await bot.sendAnimation(chatId, gifUrl, { caption: captionText });
 
-      // إرسال GIF
-      await bot.sendAnimation(chatId,
-        "https://media.giphy.com/media/ASd0Ukj0y3qMM/giphy.gif",
-        { caption: "👋 مرحبًا بالجميع! أنا بوت جديد 🤖" }
-      );
-
-      // إرسال مقطع صوتي
-      await bot.sendAudio(chatId,
-        "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-        { caption: "🎵 مقطع ترحيبي" }
-      );
-
-      // رسالة نصية إضافية
-      await bot.sendMessage(chatId, "✨ سعيد بوجودي معكم 💙");
+        // إرسال الصوت
+        await bot.sendAudio(chatId, audioUrl, { caption: "🎵 استمع إلى هذا الصوت!" });
+      }
+    } catch (err) {
+      console.error("❌ server_2 error:", err.message);
     }
-
-  } catch (err) {
-    console.error("Welcome error:", err.message);
-  }
-});
+  });
+}
