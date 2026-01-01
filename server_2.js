@@ -1,27 +1,32 @@
 export function initServer2(bot) {
-  // الترحيب عند إضافته لأي مجموعة
   bot.on("my_chat_member", async (msg) => {
     try {
-      const botId = bot.botInfo.id;
       const chatId = msg.chat.id;
+      const botId = bot.botInfo.id;
 
-      // تحقق أن البوت تمت إضافته الآن
-      if (msg.new_chat_member?.user?.id !== botId) return;
-      if ((msg.old_chat_member?.status === "left" || msg.old_chat_member?.status === "kicked") &&
-          (msg.new_chat_member?.status === "member" || msg.new_chat_member?.status === "administrator")) {
+      // تأكد أن التحديث يخص البوت نفسه
+      if (msg.new_chat_member.user.id !== botId) return;
 
-        const gifUrl = "https://i.ibb.co/Tq4Sj5KT/50574e0daddf43ac4cb8ee584c4d09ae.gif"; // رابط GIF
-        const audioUrl = ""; // رابط صوتي
-        const captionText = "👋 مرحبًا بالجميع!\nأنا بوت جديد في هذا الجروب 🤖\nسعيد بوجودي معكم 💙";
+      const oldStatus = msg.old_chat_member.status;
+      const newStatus = msg.new_chat_member.status;
 
-        // إرسال GIF
-        await bot.sendAnimation(chatId, gifUrl, { caption: captionText });
+      // تم إضافة البوت للتو
+      if ((oldStatus === "left" || oldStatus === "kicked") &&
+          (newStatus === "member" || newStatus === "administrator")) {
 
-        // إرسال الصوت
-        await bot.sendAudio(chatId, audioUrl, { caption: "🎵 استمع إلى هذا الصوت!" });
+        const gifUrl = "https://i.ibb.co/Tq4Sj5KT/50574e0daddf43ac4cb8ee584c4d09ae.gif";
+        const audioUrl = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+
+        // إرسال صورة GIF ترحيبية
+        await bot.sendAnimation(chatId, gifUrl, {
+          caption: "👋 مرحبًا بالجميع!\nأنا بوت جديد في هذا الجروب 🤖"
+        });
+
+        // إرسال مقطع صوتي ترحيبي
+        await bot.sendAudio(chatId, audioUrl, { title: "ترحيب صوتي" });
       }
     } catch (err) {
-      console.error("❌ server_2 error:", err.message);
+      console.error("❌ Welcome error:", err.message);
     }
   });
 }
