@@ -14,36 +14,24 @@ const PORT = process.env.PORT || 3000;
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const WEBHOOK_URL = process.env.WEBHOOK_URL;
 
-if (!BOT_TOKEN || !WEBHOOK_URL) {
-  console.error("❌ BOT_TOKEN أو WEBHOOK_URL غير موجود");
-  process.exit(1);
-}
-
-// إنشاء البوت Webhook فقط
 const bot = new TelegramBot(BOT_TOKEN, { polling: false });
 
-/* استقبال تحديثات تيليغرام */
+// webhook
 app.post("/webhook", (req, res) => {
   bot.processUpdate(req.body);
   res.sendStatus(200);
 });
 
-/* ربط الأنظمة */
-KING(bot);      // أوامر الأدمن + الصور
-server2(bot);   // الترحيب عند الإضافة
+// تشغيل أنظمة البوت
+KING(bot);
+server2(bot);
 
-/* فحص السيرفر */
+// فحص السيرفر
 app.get("/", (req, res) => {
-  res.send("✅ Bot is running");
+  res.send("OK");
 });
 
-/* تشغيل + تعيين Webhook */
 app.listen(PORT, async () => {
-  console.log(`🚀 Server running on ${PORT}`);
-
-  await bot.setWebHook(`${WEBHOOK_URL}/webhook`, {
-    allowed_updates: ["message", "my_chat_member"]
-  });
-
-  console.log("✅ Webhook set correctly");
+  console.log("🚀 Server running on port", PORT);
+  await bot.setWebHook(`${WEBHOOK_URL}/webhook`);
 });
