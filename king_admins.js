@@ -1,86 +1,25 @@
-import adText from "./ad_txt.js";
 import adImg from "./ad_img.js";
+import adText from "./ad_txt.js";
 import adVid from "./ad_vid.js";
 
 const ADMIN_ID = Number(process.env.ADMIN_ID);
 
-export default async function KING(bot, msg) {
-  try {
-    console.log(
-      "📩 From:", msg.from?.id,
-      "| Text:", msg.text || "—",
-      "| Type:",
-      msg.photo ? "photo" :
-      msg.video ? "video" :
-      msg.document ? "document" :
-      msg.audio ? "audio" :
-      msg.voice ? "voice" :
-      msg.animation ? "animation" :
-      "text"
-    );
+export default function KING(bot) {
+  bot.on("message", async (msg) => {
+    try {
+      if (msg.from.id !== ADMIN_ID) return;
 
-    // تحقق من الأدمن
-    if (msg.from.id !== ADMIN_ID) {
-      console.log("⛔ Not admin, ignored");
-      return;
+      if (msg.text) {
+        await adImg(bot, msg);
+        await adVid(bot, msg);
+        await adText(bot, msg);
+      }
+
+      if (msg.photo) await adImg(bot, msg);
+      if (msg.video) await adVid(bot, msg);
+
+    } catch (err) {
+      console.error("❌ KING error:", err.message);
     }
-
-    /* ===============================
-       📝 النصوص + أوامر الصور والفيديو
-       =============================== */
-    if (msg.text) {
-      await adImg(bot, msg);   // أوامر الصور
-      await adVid(bot, msg);   // أوامر الفيديو
-      await adText(bot, msg);  // النصوص
-    }
-
-    /* ===============================
-       📷 صورة
-       =============================== */
-    if (msg.photo) {
-      await adImg(bot, msg);
-    }
-
-    /* ===============================
-       🎥 فيديو
-       =============================== */
-    if (msg.video) {
-      await adVid(bot, msg);
-    }
-
-    /* ===============================
-       🎵 صوت
-       =============================== */
-    if (msg.audio) {
-      await bot.sendAudio(msg.chat.id, msg.audio.file_id);
-    }
-
-    /* ===============================
-       🎤 رسالة صوتية
-       =============================== */
-    if (msg.voice) {
-      await bot.sendVoice(msg.chat.id, msg.voice.file_id);
-    }
-
-    /* ===============================
-       📄 ملفات
-       =============================== */
-    if (msg.document) {
-      await bot.sendDocument(msg.chat.id, msg.document.file_id);
-    }
-
-    /* ===============================
-       🎞️ GIF / Animation
-       =============================== */
-    if (msg.animation) {
-      await bot.sendAnimation(msg.chat.id, msg.animation.file_id);
-    }
-
-  } catch (err) {
-    console.error("❌ KING error:", err);
-    await bot.sendMessage(
-      msg.chat.id,
-      "⚠️ حدث خطأ أثناء معالجة الرسالة"
-    );
-  }
+  });
 }
