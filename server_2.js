@@ -1,33 +1,34 @@
-export default function server2(bot) {
+bot.on("chat_member", async (msg) => {
+  try {
+    const chatId = msg.chat.id;
+    const botId = bot.botInfo.id;
 
-  bot.on("message", async (msg) => {
+    // تحقق أن البوت تمت إضافته
+    if (msg.new_chat_member.user.id !== botId) return;
 
-    // 🟢 حدث إضافة أعضاء جدد
-    if (msg.new_chat_members) {
+    const oldStatus = msg.old_chat_member.status;
+    const newStatus = msg.new_chat_member.status;
 
-      for (const member of msg.new_chat_members) {
+    if ((oldStatus === "left" || oldStatus === "kicked") &&
+        (newStatus === "member" || newStatus === "administrator")) {
 
-        // 🔥 فقط عندما يتم إضافة البوت نفسه
-        if (member.is_bot && member.username === bot.username) {
+      // إرسال GIF
+      await bot.sendAnimation(chatId,
+        "https://media.giphy.com/media/ASd0Ukj0y3qMM/giphy.gif",
+        { caption: "👋 مرحبًا بالجميع! أنا بوت جديد 🤖" }
+      );
 
-          const chatId = msg.chat.id;
+      // إرسال مقطع صوتي
+      await bot.sendAudio(chatId,
+        "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+        { caption: "🎵 مقطع ترحيبي" }
+      );
 
-          // صورة GIF
-          await bot.sendAnimation(
-            chatId,
-            "https://i.ibb.co/0jZ3YwK/welcome.gif",
-            {
-              caption: "👋 مرحبًا! تم تفعّيلي بنجاح\n🚀 أنا جاهز للعمل"
-            }
-          );
-
-          // مقطع صوتي
-          await bot.sendAudio(
-            chatId,
-            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-          );
-        }
-      }
+      // رسالة نصية إضافية
+      await bot.sendMessage(chatId, "✨ سعيد بوجودي معكم 💙");
     }
-  });
-}
+
+  } catch (err) {
+    console.error("Welcome error:", err.message);
+  }
+});
