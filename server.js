@@ -3,7 +3,8 @@ import TelegramBot from "node-telegram-bot-api";
 import dotenv from "dotenv";
 
 import KING from "./king_admins.js";
-import Extraction from "./Extraction.js"; // ✅ الاستبدال هنا
+import Extraction from "./Extraction.js";
+import Orders from "./Orders.js"; // إضافة ملف الأوامر
 
 dotenv.config();
 
@@ -24,7 +25,8 @@ app.post("/webhook", (req, res) => {
 
 // تشغيل أنظمة البوت
 KING(bot);
-Extraction(bot); // ✅ بدل server_2
+Extraction(bot);
+Orders(bot); // ✅ تفعيل قائمة الأوامر تلقائيًا
 
 // فحص السيرفر
 app.get("/", (req, res) => {
@@ -33,5 +35,11 @@ app.get("/", (req, res) => {
 
 app.listen(PORT, async () => {
   console.log("🚀 Server running on port", PORT);
-  await bot.setWebHook(`${WEBHOOK_URL}/webhook`);
+
+  try {
+    await bot.setWebHook(`${WEBHOOK_URL}/webhook`);
+    console.log("✅ Webhook تم تفعيله بنجاح");
+  } catch (err) {
+    console.error("❌ حدث خطأ أثناء تفعيل Webhook:", err.message);
+  }
 });
