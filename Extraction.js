@@ -1,5 +1,8 @@
 export default function Extraction(bot) {
 
+  // ضع هنا ID الحساب المسؤول عن البوت
+  const BOT_ADMIN_ID = 123456789; // ← ضع ID حسابك هنا
+
   bot.on("message", async (msg) => {
     if (!msg.reply_to_message) return;
     if (msg.text !== "استخراج") return;
@@ -7,20 +10,11 @@ export default function Extraction(bot) {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
 
-    // ✅ فحص هل المرسل أدمن
-    try {
-      const member = await bot.getChatMember(chatId, userId);
-
-      if (
-        member.status !== "administrator" &&
-        member.status !== "creator"
-      ) {
-        return bot.sendMessage(chatId, "❌ هذا الأمر مخصص للأدمن فقط", {
-          reply_to_message_id: msg.message_id
-        });
-      }
-    } catch (e) {
-      return;
+    // ✅ فحص إذا المرسل هو صاحب البوت
+    if (userId !== BOT_ADMIN_ID) {
+      return bot.sendMessage(chatId, "❌ هذا الأمر مخصص لصاحب البوت فقط", {
+        reply_to_message_id: msg.message_id
+      });
     }
 
     // ✅ التأكد أن الرد على ملصق
