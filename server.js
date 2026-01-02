@@ -3,7 +3,7 @@ import TelegramBot from "node-telegram-bot-api";
 import dotenv from "dotenv";
 
 import KING from "./king_admins.js";
-import Extraction from "./Extraction.js";
+import Extraction from "./Extraction.js"; // ✅ الاستبدال هنا
 
 dotenv.config();
 
@@ -24,7 +24,7 @@ app.post("/webhook", (req, res) => {
 
 // تشغيل أنظمة البوت
 KING(bot);
-Extraction(bot);
+Extraction(bot); // ✅ بدل server_2
 
 // فحص السيرفر
 app.get("/", (req, res) => {
