@@ -25,29 +25,6 @@ export default function Orders(bot) {
 
     } catch (err) {
       console.error(err);
-      bot.sendMessage(msg.chat.id, "❌ حدث خطأالأوامر.", {
-        reply_to_message_id: msg.message_id
-      });
-    }
-  });
-
-}جلب الأوامر.", {
-        reply_to_message_id: msg.message_id
-      });
-    }
-  });
-
-} البوت:\n\n";
-      commands.forEach((cmd, index) => {
-        reply += `${index + 1}. /${cmd.command} → ${cmd.description || "لا يوجد وصف"}\n`;
-      });
-
-      bot.sendMessage(msg.chat.id, reply, {
-        reply_to_message_id: msg.message_id
-      });
-
-    } catch (err) {
-      console.error(err);
       bot.sendMessage(msg.chat.id, "❌ حدث خطأ أثناء جلب الأوامر.", {
         reply_to_message_id: msg.message_id
       });
