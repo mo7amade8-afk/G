@@ -2,7 +2,7 @@ export default function Extraction(bot) {
   // قراءة الـ ADMIN_ID من متغير البيئة
   const ADMIN_ID = process.env.ADMIN_ID; // ← ضع ID الحساب في Render
 
-  if (!BOT_ADMIN_ID) {
+  if (!ADMIN_ID) {
     console.error("❌ ADMIN_ID غير موجود في متغيرات البيئة!");
     return;
   }
