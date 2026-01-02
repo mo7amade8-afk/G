@@ -1,10 +1,10 @@
 export default function Extraction(bot) {
-  // قراءة الـ ADMIN_ID من متغير البيئة
-  const ADMIN_ID = process.env.ADMIN_ID; // ← ضع ID الحساب في Render
 
-  if (!BOT_ADMIN_ID) {
-    console.error("❌ ADMIN_ID غير موجود في متغيرات البيئة!");
-    return;
+  // ✅ نأخذ ADMIN_ID من environment variables
+  const ADMIN_ID = process.env.ADMIN_ID;
+
+  if (!ADMIN_ID) {
+    console.warn("⚠️ ADMIN_ID غير محدد في البيئة!");
   }
 
   bot.on("message", async (msg) => {
@@ -15,7 +15,7 @@ export default function Extraction(bot) {
     const userId = msg.from.id;
 
     // ✅ فحص إذا المرسل هو صاحب البوت
-    if (userId.toString() !== ADMIN_ID.toString()) {
+    if (userId.toString() !== ADMIN_ID) {
       return bot.sendMessage(chatId, "❌ هذا الأمر مخصص لصاحب البوت فقط", {
         reply_to_message_id: msg.message_id
       });
@@ -37,8 +37,14 @@ ${sticker.file_unique_id}
 
 📁 file_id:
 ${sticker.file_id}
-`;
 
-    bot.sendMessage(chatId, text, { reply_to_message_id: msg.message_id });
+📦 Sticker Set:
+${sticker.set_name || "ملصق خاص"}
+    `;
+
+    bot.sendMessage(chatId, text.trim(), {
+      reply_to_message_id: msg.message_id
+    });
   });
+
 }
