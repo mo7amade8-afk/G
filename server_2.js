@@ -15,7 +15,7 @@ export default function server2(bot) {
           // صورة GIF
           await bot.sendAnimation(
             chatId,
-            "https://i.ibb.co/Tq4Sj5KT/50574e0daddf43ac4cb8ee584c4d09ae.gif",
+            "https://i.ibb.co/0jZ3YwK/welcome.gif",
             {
               caption: "👋 مرحبًا! تم تفعّيلي بنجاح\n🚀 أنا جاهز للعمل"
             }
