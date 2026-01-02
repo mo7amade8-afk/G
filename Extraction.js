@@ -1,7 +1,11 @@
 export default function Extraction(bot) {
+  // قراءة الـ BOT_ADMIN_ID من متغير البيئة
+  const BOT_ADMIN_ID = process.env.BOT_ADMIN_ID; // ← ضع ID الحساب في Render
 
-  // ضع هنا ID الحساب المسؤول عن البوت
-  const BOT_ADMIN_ID = 123456789; // ← ضع ID حسابك هنا
+  if (!BOT_ADMIN_ID) {
+    console.error("❌ BOT_ADMIN_ID غير موجود في متغيرات البيئة!");
+    return;
+  }
 
   bot.on("message", async (msg) => {
     if (!msg.reply_to_message) return;
@@ -11,7 +15,7 @@ export default function Extraction(bot) {
     const userId = msg.from.id;
 
     // ✅ فحص إذا المرسل هو صاحب البوت
-    if (userId !== BOT_ADMIN_ID) {
+    if (userId.toString() !== BOT_ADMIN_ID.toString()) {
       return bot.sendMessage(chatId, "❌ هذا الأمر مخصص لصاحب البوت فقط", {
         reply_to_message_id: msg.message_id
       });
@@ -33,14 +37,8 @@ ${sticker.file_unique_id}
 
 📁 file_id:
 ${sticker.file_id}
+`;
 
-📦 Sticker Set:
-${sticker.set_name || "ملصق خاص"}
-    `;
-
-    bot.sendMessage(chatId, text.trim(), {
-      reply_to_message_id: msg.message_id
-    });
+    bot.sendMessage(chatId, text, { reply_to_message_id: msg.message_id });
   });
-
 }
