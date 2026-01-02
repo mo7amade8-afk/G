@@ -1,9 +1,9 @@
 export default function Extraction(bot) {
-  // قراءة الـ BOT_ADMIN_ID من متغير البيئة
-  const BOT_ADMIN_ID = process.env.BOT_ADMIN_ID; // ← ضع ID الحساب في Render
+  // قراءة الـ ADMIN_ID من متغير البيئة
+  const ADMIN_ID = process.env.ADMIN_ID; // ← ضع ID الحساب في Render
 
   if (!BOT_ADMIN_ID) {
-    console.error("❌ BOT_ADMIN_ID غير موجود في متغيرات البيئة!");
+    console.error("❌ ADMIN_ID غير موجود في متغيرات البيئة!");
     return;
   }
 
@@ -15,7 +15,7 @@ export default function Extraction(bot) {
     const userId = msg.from.id;
 
     // ✅ فحص إذا المرسل هو صاحب البوت
-    if (userId.toString() !== BOT_ADMIN_ID.toString()) {
+    if (userId.toString() !== ADMIN_ID.toString()) {
       return bot.sendMessage(chatId, "❌ هذا الأمر مخصص لصاحب البوت فقط", {
         reply_to_message_id: msg.message_id
       });
