@@ -1,5 +1,5 @@
-// txt_1.js
 const welcomeDB = new Map();
+const ADMIN_ID = Number(process.env.ADMIN_ID);
 
 const replies = [
   "اهلا بك 🙂 مما لا شك انك لست الزعيم كاجينو دي شادو 😮‍💨 يؤسفني قول لك انني لازلت تحت تطوور وهدف 👑 شادو 👑 ان يجعلني اقوا بوت على منصة تليغرام 🔥 سا يكون لدي عدت عوامل وقدرات واهداف ومنهم حروب ضد عصابات و منهم دردشات معى ضيوفنا الكرام ☺️",
@@ -57,7 +57,8 @@ function handleCallbackQuery(bot) {
 export { textHandler, handleCallbackQuery };
 
 
-// server.js
+ثم في ملف king_admins.js، قم باستدعاء textHandler و handleCallbackQuery:
+
 import { textHandler, handleCallbackQuery } from './txt_1.js';
 
 export default function KING(bot) {
