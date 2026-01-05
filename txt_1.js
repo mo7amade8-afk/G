@@ -1,10 +1,11 @@
+// txt_1.js
 const welcomeDB = new Map();
 
 const replies = [
   "اهلا بك 🙂 مما لا شك انك لست الزعيم كاجينو دي شادو 😮‍💨 يؤسفني قول لك انني لازلت تحت تطوور وهدف 👑 شادو 👑 ان يجعلني اقوا بوت على منصة تليغرام 🔥 سا يكون لدي عدت عوامل وقدرات واهداف ومنهم حروب ضد عصابات و منهم دردشات معى ضيوفنا الكرام ☺️",
 ];
 
-export default async function textHandler(bot, msg) {
+async function textHandler(bot, msg) {
   try {
     if (!msg.text || msg.from.id === ADMIN_ID) return;
     const chatId = msg.chat.id;
@@ -33,7 +34,7 @@ export default async function textHandler(bot, msg) {
   }
 }
 
-export function handleCallbackQuery(bot) {
+function handleCallbackQuery(bot) {
   bot.on("callback_query", async (callbackQuery) => {
     try {
       const userId = callbackQuery.from.id;
@@ -53,13 +54,17 @@ export function handleCallbackQuery(bot) {
   });
 }
 
+export { textHandler, handleCallbackQuery };
+
 
 // server.js
-import textHandler, { handleCallbackQuery } from './txt_1.js';
+import { textHandler, handleCallbackQuery } from './txt_1.js';
 
 export default function KING(bot) {
-  // ...
-  textHandler(bot, msg);
+  bot.on("message", async (msg) => {
+    // ...
+    await textHandler(bot, msg);
+    // ...
+  });
   handleCallbackQuery(bot);
-  // ...
 }
