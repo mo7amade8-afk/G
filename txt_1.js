@@ -33,20 +33,33 @@ export default async function textHandler(bot, msg) {
   }
 }
 
-bot.on("callback_query", async (callbackQuery) => {
-  try {
-    const userId = callbackQuery.from.id;
-    const chatId = callbackQuery.message.chat.id;
-    const data = callbackQuery.data;
+export function handleCallbackQuery(bot) {
+  bot.on("callback_query", async (callbackQuery) => {
+    try {
+      const userId = callbackQuery.from.id;
+      const chatId = callbackQuery.message.chat.id;
+      const data = callbackQuery.data;
 
-    if (data.startsWith("stop_welcome_")) {
-      welcomeDB.set(userId, false);
-      await bot.sendMessage(chatId, "تم إيقاف الترحيب");
-    } else if (data.startsWith("continue_welcome_")) {
-      welcomeDB.set(userId, "continue");
-      await bot.sendMessage(chatId, "سيتم الاستمرار في الترحيب");
+      if (data.startsWith("stop_welcome_")) {
+        welcomeDB.set(userId, false);
+        await bot.sendMessage(chatId, "تم إيقاف الترحيب");
+      } else if (data.startsWith("continue_welcome_")) {
+        welcomeDB.set(userId, "continue");
+        await bot.sendMessage(chatId, "سيتم الاستمرار في الترحيب");
+      }
+    } catch (err) {
+      console.error("callback_query error:", err.message);
     }
-  } catch (err) {
-    console.error("callback_query error:", err.message);
-  }
-});
+  });
+}
+
+
+// server.js
+import textHandler, { handleCallbackQuery } from './txt_1.js';
+
+export default function KING(bot) {
+  // ...
+  textHandler(bot, msg);
+  handleCallbackQuery(bot);
+  // ...
+}
