@@ -19,6 +19,8 @@ import colors from "colors";
 import cliTable from "cli-table3";
 import Jimp from "jimp";
 import sharp from "sharp";
+import { translate as gTranslate } from "google-translate-open-api";
+import OpenCC from "opencc";
 
 process.env.NODE_NO_WARNINGS = "1";
 process.removeAllListeners("warning");
@@ -38,6 +40,8 @@ const WEBHOOK_URL = process.env.WEBHOOK_URL;
 if (!BOT_TOKEN || !WEBHOOK_URL) process.exit(1);
 
 const spinner = ora("Starting SHADOW system...").start();
+spinner.color = 'magenta';
+
 const bot = new TelegramBot(BOT_TOKEN, { webHook: true });
 ffmpeg.setFfmpegPath(ffmpegPath);
 new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -50,19 +54,11 @@ const SHADOW_BANNER = `
    SYSTEM ONLINE
 ━━━━━━━━━━━━━━━━━━━━
 `;
-
 console.log(gradient.purple(chalk.bold(SHADOW_BANNER)));
-
-// Example of colorful startup logs
 console.log(gradient.rainbow("🚀 Server is booting up..."));
-console.log(colors.cyan(`Port: ${PORT}`));
-console.log(colors.green(`Bot Token Loaded`));
-console.log(colors.yellow(`Webhook URL: ${WEBHOOK_URL}`));
-
-// Colorful spinner messages
-spinner.color = 'magenta';
-spinner.text = 'Initializing modules...';
-spinner.start();
+console.log(chalk.cyan(`Port: ${PORT}`));
+console.log(chalk.green(`Bot Token Loaded`));
+console.log(chalk.yellow(`Webhook URL: ${WEBHOOK_URL}`));
 
 app.get("/", (req, res) => {
   console.log(colors.blue("Received / request"));
@@ -81,24 +77,20 @@ app.post(`/bot${BOT_TOKEN}`, (req, res) => {
 });
 
 bot.setWebHook(`${WEBHOOK_URL}/bot${BOT_TOKEN}`)
-  .then(() => {
-    spinner.succeed(gradient.cyan("Webhook connected successfully"));
-  })
-  .catch((err) => {
-    spinner.fail(gradient.red("Webhook failed: " + err.message));
-  });
+  .then(() => spinner.succeed(gradient.cyan("Webhook connected successfully")))
+  .catch(err => spinner.fail(gradient.red("Webhook failed: " + err.message)));
 
 async function dispatch(ctx) {
   try {
     const r = await KING(ctx, bot);
     if (r?.handled) return;
   } catch (err) {
-    console.log(colors.red("Error in dispatch:"), err.message);
+    console.log(chalk.red("Error in dispatch:"), err.message);
   }
 }
 
 bot.on("message", (msg) => {
-  console.log(colors.yellow(`Message received from ${msg.from.username || msg.from.id}`));
+  console.log(colors.yellow(`Message from ${msg.from.username || msg.from.id}`));
   dispatch({ message: msg });
 });
 
