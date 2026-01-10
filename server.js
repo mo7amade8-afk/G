@@ -13,6 +13,12 @@ import OpenAI from "openai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { HfInference } from "@huggingface/inference";
 import KING from "./king_admins.js";
+import figlet from "figlet";
+import cfonts from "cfonts";
+import colors from "colors";
+import cliTable from "cli-table3";
+import Jimp from "jimp";
+import sharp from "sharp";
 
 process.env.NODE_NO_WARNINGS = "1";
 process.removeAllListeners("warning");
@@ -47,28 +53,54 @@ const SHADOW_BANNER = `
 
 console.log(gradient.purple(chalk.bold(SHADOW_BANNER)));
 
-app.get("/", (req, res) => res.json({ status: "OK", system: "SHADOW" }));
-app.get("/health", (req, res) => res.send("healthy"));
+// Example of colorful startup logs
+console.log(gradient.rainbow("🚀 Server is booting up..."));
+console.log(colors.cyan(`Port: ${PORT}`));
+console.log(colors.green(`Bot Token Loaded`));
+console.log(colors.yellow(`Webhook URL: ${WEBHOOK_URL}`));
 
-// المسار الرئيسي للـ webhook
+// Colorful spinner messages
+spinner.color = 'magenta';
+spinner.text = 'Initializing modules...';
+spinner.start();
+
+app.get("/", (req, res) => {
+  console.log(colors.blue("Received / request"));
+  res.json({ status: "OK", system: "SHADOW" });
+});
+
+app.get("/health", (req, res) => {
+  console.log(colors.green("Health check requested"));
+  res.send("healthy");
+});
+
 app.post(`/bot${BOT_TOKEN}`, (req, res) => {
+  console.log(colors.magenta("Webhook update received"));
   bot.processUpdate(req.body);
   res.sendStatus(200);
 });
 
-// تأكد من أن webhook مضبوط
 bot.setWebHook(`${WEBHOOK_URL}/bot${BOT_TOKEN}`)
-  .then(() => spinner.succeed("Webhook connected"))
-  .catch((err) => spinner.fail("Webhook failed: " + err.message));
+  .then(() => {
+    spinner.succeed(gradient.cyan("Webhook connected successfully"));
+  })
+  .catch((err) => {
+    spinner.fail(gradient.red("Webhook failed: " + err.message));
+  });
 
 async function dispatch(ctx) {
   try {
     const r = await KING(ctx, bot);
     if (r?.handled) return;
-  } catch {}
+  } catch (err) {
+    console.log(colors.red("Error in dispatch:"), err.message);
+  }
 }
 
-bot.on("message", (msg) => dispatch({ message: msg }));
+bot.on("message", (msg) => {
+  console.log(colors.yellow(`Message received from ${msg.from.username || msg.from.id}`));
+  dispatch({ message: msg });
+});
 
 async function translate(text, target = "en") {
   const r = await fetch("https://libretranslate.de/translate", {
@@ -76,24 +108,33 @@ async function translate(text, target = "en") {
     body: JSON.stringify({ q: text, source: "auto", target, format: "text" }),
     headers: { "Content-Type": "application/json" },
   });
-  return (await r.json()).translatedText;
+  const translated = (await r.json()).translatedText;
+  console.log(colors.cyan(`Translated: ${translated}`));
+  return translated;
 }
 
 function fancy(text) {
-  return gradient.rainbow(text);
+  const styled = gradient.rainbow(text);
+  console.log(styled);
+  return styled;
 }
 
 async function imageToText(path) {
+  console.log(colors.magenta(`Processing image: ${path}`));
   const r = await Tesseract.recognize(path, "ara+eng");
+  console.log(colors.green("Image processed successfully"));
   return r.data.text;
 }
 
 async function pdfToText(buffer) {
-  return (await pdfParse(buffer)).text;
+  console.log(colors.magenta("Processing PDF..."));
+  const text = (await pdfParse(buffer)).text;
+  console.log(colors.green("PDF processed successfully"));
+  return text;
 }
 
 const placeholders = ["", "", "", ""];
 
 app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+  console.log(gradient.rainbow(`Server listening on port ${PORT}`));
 });
