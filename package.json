@@ -40,7 +40,6 @@
     "cli-table3": "^0.6.2",
     "figlet": "^1.5.2",
     "cfonts": "^3.0.0",
-    "string-width": "^4.3.0",
     "opencc": "^1.0.5",
     "google-translate-open-api": "^1.1.0"
   }
