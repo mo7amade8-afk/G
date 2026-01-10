@@ -1,5 +1,3 @@
-process.env.NODE_NO_WARNINGS = "1";
-
 import express from "express";
 import dotenv from "dotenv";
 import TelegramBot from "node-telegram-bot-api";
@@ -16,16 +14,11 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { HfInference } from "@huggingface/inference";
 import KING from "./king_admins.js";
 
-/* placeholders لإضافة ملفات لاحقًا */
-const placeholders = [
-  "", // ملف 1
-  "", // ملف 2
-  "", // ملف 3
-  "", // ملف 4
-];
-
+process.env.NODE_NO_WARNINGS = "1";
 process.removeAllListeners("warning");
 process.on("warning", () => {});
+process.on("unhandledRejection", () => {});
+process.on("uncaughtException", () => {});
 
 dotenv.config();
 
@@ -42,10 +35,6 @@ const spinner = ora("Starting SHADOW system...").start();
 
 const bot = new TelegramBot(BOT_TOKEN);
 
-await bot.setWebHook(`${WEBHOOK_URL}/bot${BOT_TOKEN}`);
-
-spinner.succeed("Webhook connected");
-
 const SHADOW_BANNER = `
 ━━━━━━━━━━━━━━━━━━━━
       SHADOW
@@ -53,20 +42,16 @@ const SHADOW_BANNER = `
 ━━━━━━━━━━━━━━━━━━━━
 `;
 
-console.log(
-  gradient.multiline(gradient.purple)(
-    chalk.bold(SHADOW_BANNER)
-  )
-);
+async function init() {
+  await bot.setWebHook(`${WEBHOOK_URL}/bot${BOT_TOKEN}`);
+  spinner.succeed("Webhook connected");
+  console.log(gradient.purple(chalk.bold(SHADOW_BANNER)));
+}
 
-app.get("/", (req, res) => {
-  res.json({ status: "OK", system: "SHADOW" });
-});
+init();
 
-app.get("/health", (req, res) => {
-  res.send("healthy");
-});
-
+app.get("/", (req, res) => res.json({ status: "OK", system: "SHADOW" }));
+app.get("/health", (req, res) => res.send("healthy"));
 app.post(`/bot${BOT_TOKEN}`, (req, res) => {
   bot.processUpdate(req.body);
   res.sendStatus(200);
@@ -82,27 +67,18 @@ async function dispatch(ctx) {
   try {
     const r = await KING(ctx, bot);
     if (r?.handled) return;
-    /* هنا لاحقًا يمكنك التعامل مع placeholders أو أي ملفات أخرى */
   } catch {}
 }
 
-bot.on("message", (msg) => {
-  dispatch({ message: msg });
-});
+bot.on("message", (msg) => dispatch({ message: msg }));
 
 async function translate(text, target = "en") {
   const r = await fetch("https://libretranslate.de/translate", {
     method: "POST",
-    body: JSON.stringify({
-      q: text,
-      source: "auto",
-      target,
-      format: "text",
-    }),
+    body: JSON.stringify({ q: text, source: "auto", target, format: "text" }),
     headers: { "Content-Type": "application/json" },
   });
-  const j = await r.json();
-  return j.translatedText;
+  return (await r.json()).translatedText;
 }
 
 function fancy(text) {
@@ -115,11 +91,9 @@ async function imageToText(path) {
 }
 
 async function pdfToText(buffer) {
-  const d = await pdfParse(buffer);
-  return d.text;
+  return (await pdfParse(buffer)).text;
 }
 
-process.on("unhandledRejection", () => {});
-process.on("uncaughtException", () => {});
+const placeholders = ["", "", "", ""];
 
 app.listen(PORT, () => {});
