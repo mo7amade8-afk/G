@@ -32,8 +32,11 @@ const WEBHOOK_URL = process.env.WEBHOOK_URL;
 if (!BOT_TOKEN || !WEBHOOK_URL) process.exit(1);
 
 const spinner = ora("Starting SHADOW system...").start();
-
-const bot = new TelegramBot(BOT_TOKEN);
+const bot = new TelegramBot(BOT_TOKEN, { webHook: true });
+ffmpeg.setFfmpegPath(ffmpegPath);
+new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
+new HfInference(process.env.HUGGINGFACE_API_KEY || "");
 
 const SHADOW_BANNER = `
 ━━━━━━━━━━━━━━━━━━━━
@@ -42,26 +45,21 @@ const SHADOW_BANNER = `
 ━━━━━━━━━━━━━━━━━━━━
 `;
 
-async function init() {
-  await bot.setWebHook(`${WEBHOOK_URL}/bot${BOT_TOKEN}`);
-  spinner.succeed("Webhook connected");
-  console.log(gradient.purple(chalk.bold(SHADOW_BANNER)));
-}
-
-init();
+console.log(gradient.purple(chalk.bold(SHADOW_BANNER)));
 
 app.get("/", (req, res) => res.json({ status: "OK", system: "SHADOW" }));
 app.get("/health", (req, res) => res.send("healthy"));
+
+// المسار الرئيسي للـ webhook
 app.post(`/bot${BOT_TOKEN}`, (req, res) => {
   bot.processUpdate(req.body);
   res.sendStatus(200);
 });
 
-ffmpeg.setFfmpegPath(ffmpegPath);
-
-new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
-new HfInference(process.env.HUGGINGFACE_API_KEY || "");
+// تأكد من أن webhook مضبوط
+bot.setWebHook(`${WEBHOOK_URL}/bot${BOT_TOKEN}`)
+  .then(() => spinner.succeed("Webhook connected"))
+  .catch((err) => spinner.fail("Webhook failed: " + err.message));
 
 async function dispatch(ctx) {
   try {
@@ -96,4 +94,6 @@ async function pdfToText(buffer) {
 
 const placeholders = ["", "", "", ""];
 
-app.listen(PORT, () => {});
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
+});
