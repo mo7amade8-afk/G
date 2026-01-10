@@ -1,3 +1,5 @@
+process.env.NODE_NO_WARNINGS = "1";
+
 import express from "express";
 import dotenv from "dotenv";
 import TelegramBot from "node-telegram-bot-api";
@@ -14,6 +16,17 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { HfInference } from "@huggingface/inference";
 import KING from "./king_admins.js";
 
+/* placeholders لإضافة ملفات لاحقًا */
+const placeholders = [
+  "", // ملف 1
+  "", // ملف 2
+  "", // ملف 3
+  "", // ملف 4
+];
+
+process.removeAllListeners("warning");
+process.on("warning", () => {});
+
 dotenv.config();
 
 const app = express();
@@ -27,7 +40,7 @@ if (!BOT_TOKEN || !WEBHOOK_URL) process.exit(1);
 
 const spinner = ora("Starting SHADOW system...").start();
 
-const bot = new TelegramBot(BOT_TOKEN, { webHook: true });
+const bot = new TelegramBot(BOT_TOKEN);
 
 await bot.setWebHook(`${WEBHOOK_URL}/bot${BOT_TOKEN}`);
 
@@ -41,7 +54,7 @@ const SHADOW_BANNER = `
 `;
 
 console.log(
-  gradient.purple.multiline(
+  gradient.multiline(gradient.purple)(
     chalk.bold(SHADOW_BANNER)
   )
 );
@@ -61,17 +74,16 @@ app.post(`/bot${BOT_TOKEN}`, (req, res) => {
 
 ffmpeg.setFfmpegPath(ffmpegPath);
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
-const hf = new HfInference(process.env.HUGGINGFACE_API_KEY || "");
+new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
+new HfInference(process.env.HUGGINGFACE_API_KEY || "");
 
 async function dispatch(ctx) {
   try {
     const r = await KING(ctx, bot);
     if (r?.handled) return;
-  } catch (e) {
-    console.log(chalk.red(e.message));
-  }
+    /* هنا لاحقًا يمكنك التعامل مع placeholders أو أي ملفات أخرى */
+  } catch {}
 }
 
 bot.on("message", (msg) => {
